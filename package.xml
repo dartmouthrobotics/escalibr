@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>escalibr</name>
+  <version>1.0.0</version>
+  <description>
+    To Do.
+  </description>
+
+  <author email="mroznere@gmail.com">Monika Roznere</author>
+  <maintainer email="mroznere@gmail.com">Monika Roznere</maintainer>
+
+  <license>MIT</license>
+
+  <url type="repository">TODO</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>rospy</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>roslint</build_depend>
+
+  <build_export_depend>rospy</build_export_depend>
+  <build_export_depend>roscpp</build_export_depend>
+  <build_export_depend>roslint</build_export_depend>
+
+  <exec_depend>rospy</exec_depend>
+  <exec_depend>roscpp</exec_depend>
+  <exec_depend>roslint</exec_depend>
+
+</package>
