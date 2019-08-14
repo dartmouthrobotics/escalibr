@@ -1,11 +1,25 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(escalibr)
 
+find_package(OpenCV 3.0 QUIET)
+if(NOT OpenCV_FOUND)
+   find_package(OpenCV 2.4.3 QUIET)
+   if(NOT OpenCV_FOUND)
+      message(FATAL_ERROR "OpenCV > 2.4.3 not found.")
+   endif()
+endif()
+
+find_package(Boost COMPONENTS system)
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   roslint
+  sensor_msgs
+  message_generation
+  message_filters
+  ping_nodelet
+  cv_bridge
 )
 
 
@@ -15,35 +29,48 @@ catkin_package(
   CATKIN_DEPENDS roscpp
                  rospy
                  roslint
+                 sensor_msgs
+                 message_generation
+                 message_filters
+                 ping_nodelet
+                 cv_bridge
+                 opencv2
 )
 
 
 include_directories(include
   ${catkin_INCLUDE_DIRS}
+  ${Boost_INCLUDE_DIRS}
 )
 
 
-add_executable(super_coarse_calibr
-  src/Options/super_coarse.cpp
+add_executable(calibrate
+  src/calibrate.cpp
+  src/EchoSounderCameraHandler.cpp
 )
 
 
-#add_library(${PROJECT_NAME}
-#)
+add_library(${PROJECT_NAME}
+  src/EchoSounderCameraHandler.cpp
+)
 
-target_link_libraries(super_coarse_calibr
-  #${PROJECT_NAME}
+target_link_libraries(calibrate
+  ${PROJECT_NAME}
   ${catkin_LIBRARIES}
+  ${Boost_LIBRARIES}
+  ${OpenCV_LIBS}
 )
 
 
 roslint_cpp(
-  src/Options/super_coarse.cpp
+  src/calibrate.cpp
+  src/EchoSounderCameraHandler.cpp
+  include/${PROJECT_NAME}/EchoSounderCameraHandler.h
 )
 
-#install(DIRECTORY include/${PROJECT_NAME}/
-#  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-#)
+install(DIRECTORY include/${PROJECT_NAME}/
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+)
 
 install(DIRECTORY launch/
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
