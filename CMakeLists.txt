@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(escalibr)
 
+add_compile_options(-std=c++11)
+
 find_package(OpenCV 3.0 QUIET)
 if(NOT OpenCV_FOUND)
    find_package(OpenCV 2.4.3 QUIET)
@@ -9,6 +11,7 @@ if(NOT OpenCV_FOUND)
    endif()
 endif()
 
+find_package(Eigen3 REQUIRED)
 find_package(Boost COMPONENTS system)
 
 find_package(catkin REQUIRED COMPONENTS
@@ -41,6 +44,7 @@ catkin_package(
 include_directories(include
   ${catkin_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
+  ${EIGEN3_INCLUDE_DIR}
 )
 
 
@@ -59,6 +63,7 @@ target_link_libraries(calibrate
   ${catkin_LIBRARIES}
   ${Boost_LIBRARIES}
   ${OpenCV_LIBS}
+  ${EIGEN3_LIBS}
 )
 
 

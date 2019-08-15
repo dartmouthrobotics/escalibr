@@ -34,8 +34,11 @@ private:
 
   float min;  // minumum valid depth value
   float max;  // maximum valid depth value
+  float range;  // acceptable range for an ellipse
   bool prev_structure_detected;
+  cv::Mat prev_image;
   std::vector<cv::Point3f> edge_point_data;
+  std::vector< std::vector<float> > ellipse_data;
 
   message_filters::Subscriber<sensor_msgs::Image> img_sub_;
   message_filters::Subscriber<ping_nodelet::Ping> echo_sounder_sub_;
@@ -47,8 +50,10 @@ private:
   void super_coarse_callback(const sensor_msgs::ImageConstPtr& img_msg,
     const ping_nodelet::Ping::ConstPtr& echo_sounder_msg);
 
-  bool check_ellipse();
-  void create_ellipse();
+  int check_ellipse();
+  void create_ellipse(int pointer);
+  std::vector<float> get_echo_sounder_tf();
+  void save_result(std::vector<float> result);
 };
 
 }  // namespace escalibr
