@@ -1,0 +1,23 @@
+actions: []
+authors: Monika Roznere <mroznere@gmail.com>
+brief: ''
+bugtracker: ''
+depends:
+- opencv2
+- catkin
+- roscpp
+- message_filters
+- sensor_msgs
+- roslint
+- rospy
+- message_generation
+- ping_nodelet
+- cv_bridge
+description: To Do.
+license: MIT
+maintainers: Monika Roznere <mroznere@gmail.com>
+msgs: []
+package_type: package
+repo_url: TODO
+srvs: []
+url: ''

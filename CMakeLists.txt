@@ -13,6 +13,7 @@ endif()
 
 find_package(Eigen3 REQUIRED)
 find_package(Boost COMPONENTS system)
+find_package(yaml-cpp REQUIRED)
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
@@ -45,17 +46,18 @@ include_directories(include
   ${catkin_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
   ${EIGEN3_INCLUDE_DIR}
+  ${YAML_CPP_INCLUDE_DIR}
 )
 
 
 add_executable(calibrate
   src/calibrate.cpp
-  src/EchoSounderCameraHandler.cpp
+  src/echo_sounder_camera_handler.cpp
 )
 
-
 add_library(${PROJECT_NAME}
-  src/EchoSounderCameraHandler.cpp
+  src/echo_sounder_camera_handler.cpp
+  src/ellipse_math.cpp
 )
 
 target_link_libraries(calibrate
@@ -64,13 +66,16 @@ target_link_libraries(calibrate
   ${Boost_LIBRARIES}
   ${OpenCV_LIBS}
   ${EIGEN3_LIBS}
+  ${YAML_CPP_LIBRARIES}
 )
 
 
 roslint_cpp(
   src/calibrate.cpp
-  src/EchoSounderCameraHandler.cpp
-  include/${PROJECT_NAME}/EchoSounderCameraHandler.h
+  src/echo_sounder_camera_handler.cpp
+  include/${PROJECT_NAME}/echo_sounder_camera_handler.h
+  src/ellipse_math.cpp
+  include/${PROJECT_NAME}/ellipse_math.h
 )
 
 install(DIRECTORY include/${PROJECT_NAME}/

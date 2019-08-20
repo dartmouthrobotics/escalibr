@@ -1,0 +1,3 @@
+<launch>
+ <node pkg="escalibr" type="calibrate" name="echo_sounder_camera_calibration" args="$(find escalibr)/config/calibrate_config.yaml" output="screen"/>
+</launch>

@@ -1,3 +1,0 @@
-<launch>
- <node pkg="escalibr" type="calibrate" name="echo_sounder_camera_calibration" output="screen"/>
-</launch>

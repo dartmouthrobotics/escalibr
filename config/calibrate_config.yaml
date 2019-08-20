@@ -1,0 +1,11 @@
+camera_topic: "/camera/image_raw"
+echo_sounder_topic: "/ping_nodelet/ping"
+
+# 0: coarse calibration
+calibration_method: 0
+
+# data points will be considered in the depth range [min, max]
+# range considers the room for error (in dpeth) for detecting one ellispse
+min_depth: 0.30
+max_depth: 0.60
+ellipse_depth_range: 0.5
