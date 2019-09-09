@@ -2,17 +2,34 @@
 
 Underwater Echo Sounder and Monocular Camera Calibration
 
+## Dependencies
+
+To Do
+
+## Run
+
+Before running:
+* Setup `config/calibrate_config.yaml` to suit your needs
+* Make sure there are `collected_data` and `missed_data` folders if saving images 
+
+``` console
+$ roslaunch escalibr escalibr.launch
+```
 
 ## To Do:
 
-Course Calibration:
-* Detect potential edge points
-  * Using last detected image - data points will be center of structure (ar tag?)
-  * Need 5 points for 1 ellipse
-* Determine if data points fill in an ellipse
-  * Give a range for estimation (5-10 cm?)
-* Calculate new ellipse
-* Repeat to get another ellipse
-* Get x, y, z, pitch, and yaw of the echo sounder
-  * Need two lines that touch both ellipses to find where they cross (x, y, z)
-  * Center line that goes through the center of both ellipses (pitch and yaw)
+Camera:
+* Read camera intrinsics from file
+
+Calibration:
+* Cone fitting
+* Line fitting
+
+Extra:
+* Implement saving calibration information to file
+* Add more parameters to initial YAML file
+
+Calibration GUI:
+* Visualize pointers of where to collect data
+* Finalize calibration "C" button
+* Finalize save "S" button

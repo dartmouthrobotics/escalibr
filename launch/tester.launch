@@ -1,3 +1,0 @@
-<launch>
- <node pkg="escalibr" type="testing" name="testing_marker_pose" output="screen"/>
-</launch>

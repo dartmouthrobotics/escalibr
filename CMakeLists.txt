@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 2.8.3)
 project(escalibr)
 
 add_compile_options(-std=c++11)
+add_compile_options(-pg)
+
+set(catkin_LIBRARIES ${catkin_LIBRARIES} -pg)
 
 find_package(OpenCV 3.0 QUIET)
 if(NOT OpenCV_FOUND)
@@ -57,7 +60,9 @@ add_executable(calibrate
 
 add_library(${PROJECT_NAME}
   src/echo_sounder_camera_handler.cpp
-  src/ellipse_math.cpp
+  src/calibration_math.cpp
+  src/calibration_gui.cpp
+  src/image_proc.cpp
 )
 
 target_link_libraries(calibrate
@@ -74,8 +79,12 @@ roslint_cpp(
   src/calibrate.cpp
   src/echo_sounder_camera_handler.cpp
   include/${PROJECT_NAME}/echo_sounder_camera_handler.h
-  src/ellipse_math.cpp
-  include/${PROJECT_NAME}/ellipse_math.h
+  src/calibration_math.cpp
+  include/${PROJECT_NAME}/calibration_math.h
+  src/calibration_gui.cpp
+  include/${PROJECT_NAME}/calibration_gui.h
+  src/image_proc.cpp
+  include/${PROJECT_NAME}/image_proc.h
 )
 
 install(DIRECTORY include/${PROJECT_NAME}/

@@ -4,8 +4,16 @@ echo_sounder_topic: "/ping_nodelet/ping"
 # 0: coarse calibration
 calibration_method: 0
 
-# data points will be considered in the depth range [min, max]
-# range considers the room for error (in dpeth) for detecting one ellispse
-min_depth: 0.30
-max_depth: 0.60
-ellipse_depth_range: 0.5
+# save images of collected and missed detection of sphere at the edge
+save_images: true
+
+# data points will be considered in the detect depth range [min, max]
+# range considers groupings of data points
+# min and max echo depth makes sure so no random noise occurs
+# confidence level that will be considered for detection
+min_detect_depth: 0.7
+max_detect_depth: 3.1
+detect_depth_range: 0.1
+min_echo_depth: 0.4  # echo sounder's blanking depth
+max_echo_depth: 100.0   # echo sounder's maximum depth range
+min_confidence_level: 50

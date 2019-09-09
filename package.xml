@@ -3,11 +3,11 @@
   <name>escalibr</name>
   <version>1.0.0</version>
   <description>
-    To Do.
+    Single-beam echo sounder and monocular camera calibration system.
   </description>
 
-  <author email="mroznere@gmail.com">Monika Roznere</author>
-  <maintainer email="mroznere@gmail.com">Monika Roznere</maintainer>
+  <author email="monika.roznere.gr@dartmouth.com">Monika Roznere</author>
+  <maintainer email="monika.roznere.gr@dartmouth.com">Monika Roznere</maintainer>
 
   <license>MIT</license>
 
