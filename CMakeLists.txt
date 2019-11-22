@@ -18,15 +18,19 @@ find_package(Eigen3 REQUIRED)
 find_package(Boost COMPONENTS system)
 find_package(yaml-cpp REQUIRED)
 
+#add_subdirectory(ORB_SLAM2)
+
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   roslint
   sensor_msgs
+  geometry_msgs
   message_generation
   message_filters
   ping_nodelet
   cv_bridge
+  genmsg
 )
 
 
@@ -37,6 +41,7 @@ catkin_package(
                  rospy
                  roslint
                  sensor_msgs
+                 geometry_msgs
                  message_generation
                  message_filters
                  ping_nodelet
@@ -45,11 +50,14 @@ catkin_package(
 )
 
 
+
+
 include_directories(include
   ${catkin_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
   ${EIGEN3_INCLUDE_DIR}
   ${YAML_CPP_INCLUDE_DIR}
+  /home/darobot/orb_slam/ORB_SLAM2/msg_gen/cpp/include
 )
 
 
@@ -58,8 +66,14 @@ add_executable(calibrate
   src/echo_sounder_camera_handler.cpp
 )
 
+add_executable(extract
+  src/extract.cpp
+  src/echo_sounder_camera_extractor.cpp
+)
+
 add_library(${PROJECT_NAME}
   src/echo_sounder_camera_handler.cpp
+  src/echo_sounder_camera_extractor.cpp
   src/calibration_math.cpp
   src/calibration_gui.cpp
   src/image_proc.cpp
@@ -73,6 +87,17 @@ target_link_libraries(calibrate
   ${EIGEN3_LIBS}
   ${YAML_CPP_LIBRARIES}
 )
+
+target_link_libraries(extract
+  ${PROJECT_NAME}
+  ${catkin_LIBRARIES}
+  ${Boost_LIBRARIES}
+  ${OpenCV_LIBS}
+  ${EIGEN3_LIBS}
+  ${YAML_CPP_LIBRARIES}
+)
+
+add_dependencies(extract escalibr_generate_messages_cpp)
 
 
 roslint_cpp(

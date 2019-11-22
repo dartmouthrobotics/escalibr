@@ -18,6 +18,8 @@ namespace escalibr
 // Initialize static members
 bool CalibrationGui::play = false;
 bool CalibrationGui::debug = false;
+bool CalibrationGui::calibrate = false;
+bool CalibrationGui::save = false;
 
 
 void CalibrationGui::mouse_callback(int event, int x, int y, int, void*)
@@ -40,7 +42,8 @@ void CalibrationGui::mouse_callback(int event, int x, int y, int, void*)
     distance = sqrt(static_cast<double>((cx - x)*(cx - x) + (cy - y)*(cy - y)));
     if (distance <= radius)
     {
-      std::cout << "TO DO: CALIBRATION TIME" << std::endl;
+      CalibrationGui::calibrate = true;
+      CalibrationGui::play = false;
       return;
     }
 
@@ -59,7 +62,7 @@ void CalibrationGui::mouse_callback(int event, int x, int y, int, void*)
     distance = sqrt(static_cast<double>((cx - x)*(cx - x) + (cy - y)*(cy - y)));
     if (distance <= radius)
     {
-      std::cout << "TO DO: SAVING TIME" << std::endl;
+      CalibrationGui::save = true;
       return;
     }
   }
@@ -74,7 +77,8 @@ void CalibrationGui::run(cv::Mat image, cv::KeyPoint sphere, double distance, in
   display.setTo(255);
   image.copyTo(display(cv::Rect(cv::Point(0, 0), image.size())));
 
-  if (sphere.size != 0)
+  // Draw red circle around the sphere in the image for debug mode
+  if (CalibrationGui::debug && sphere.size != 0)
   {
     cv::circle(display, sphere.pt, sphere.size/2, cv::Scalar(0, 0, 255), 3);
   }

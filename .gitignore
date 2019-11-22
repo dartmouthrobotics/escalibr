@@ -1,2 +1,7 @@
 # ignore data directory
 /data/
+image_proc/
+collected_data*
+missed_data*
+output_*
+gui.png

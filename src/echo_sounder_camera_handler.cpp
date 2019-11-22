@@ -56,10 +56,10 @@ EchoSounderCameraHandler::EchoSounderCameraHandler(int calibration_method, std::
   this->calib_gui.MIN_DEPTH_ = this->MIN_DETECT_DEPTH_;
   this->calib_gui.MAX_DEPTH_ = this->MAX_DETECT_DEPTH_;
 
-  this->img_sub_.subscribe(nh_, camera_topic, 1);
-  this->echo_sounder_sub_.subscribe(nh_, echo_sounder_topic, 1);
+  this->img_sub_.subscribe(nh_, camera_topic, 5);
+  this->echo_sounder_sub_.subscribe(nh_, echo_sounder_topic, 5);
 
-  this->sync_.reset(new Sync(SyncPolicy(5), this->img_sub_, this->echo_sounder_sub_));
+  this->sync_.reset(new Sync(SyncPolicy(15), this->img_sub_, this->echo_sounder_sub_));
 
   // TO DO: unknown if there will be other calibration methods
   if (0 == calibration_method)
@@ -86,109 +86,120 @@ void EchoSounderCameraHandler::echoSounderAndImageCallback(const sensor_msgs::Im
     return;
   }
 
-  // Undistort image
-  cv::Mat cur_image;
-  // TO DO: need to do something more intuitive
-  cv::undistort(cv_ptr->image, cur_image, this->INTRINSIC_DATA_, this->DIST_COEFFS_DATA_);
-
-  std::string message = "NO DETECTION";
-
-  // Ignore instances of noise coming from echo sounder messages
-  if (echo_sounder_msg->distance > this->MIN_ECHO_DEPTH_ && echo_sounder_msg->distance < this->MAX_ECHO_DEPTH_)
+  if (this->calib_gui.calibrate)
   {
-    // If user has pressed play then start collecting data
+    this->math_handler.calibrateEchoSounder();
+  }
+  // Prepare or continue to collect data
+  else
+  {
+    // Undistort image
+    cv::Mat cur_image;
+    cv::undistort(cv_ptr->image, cur_image, this->INTRINSIC_DATA_, this->DIST_COEFFS_DATA_);
+
+    // Used for debug mode
+    cv::KeyPoint cur_sphere;
+
+    // Base case for detection
+    std::string message = "NO DETECTION";
+
+    // If user has ESCalibr on play, then start collecting data
     if (this->calib_gui.play)
     {
-      // If --
-      //    structure was detected for at least a set amount of rounds AND
-      //    structure was detected previously AND
-      //    EITHER
-      //        no structure detected OR
-      //        confidece level is less than minimum confidence level
-      // then try to detect sphere in previous instance (image and depth)
-      if (this->FINAL_HOLD_COUNT_ <= this->counter_ && this->prev_structure_detected_ &&
-         (this->MAX_DETECT_DEPTH_ < echo_sounder_msg->distance ||
-          this->MIN_CONFIDENCE_LEVEL_ > static_cast<int>(echo_sounder_msg->confidence)))
+
+      // Only look at data within the echo sounder's range of detection to remove potential noise
+      if (echo_sounder_msg->distance > this->MIN_ECHO_DEPTH_ && echo_sounder_msg->distance < this->MAX_ECHO_DEPTH_)
       {
-        // Locate sphere in image
-        cv::KeyPoint sphere = this->image_proc.detectSphere(this->prev_image_);
-        // Calculate 3D point of sphere's center and store its information
-        bool detect_result = this->math_handler.detectEdgePoint(this->prev_depth_, sphere);
 
-        // If successful, then make sure GUI knows to show it
-        if (detect_result)
+        // If --
+        //    structure was detected for at least a set amount of rounds AND
+        //    structure was detected previously AND
+        //    EITHER
+        //        no structure detected OR
+        //        confidece level is less than minimum confidence level
+        // then try to detect sphere in previous instance (image and depth)
+        if (this->FINAL_HOLD_COUNT_ <= this->counter_ && this->prev_structure_detected_ &&
+           (this->MAX_DETECT_DEPTH_ < echo_sounder_msg->distance ||
+            this->MIN_CONFIDENCE_LEVEL_ > static_cast<int>(echo_sounder_msg->confidence)))
         {
-          // Get index from distance value and store sphere's center point in a data structure
-          int d_ind = static_cast<int>((this->prev_depth_ - this->MIN_DETECT_DEPTH_) / this->DETECT_DEPTH_RANGE_);
-          this->calib_gui.visual_point_data_.at(d_ind).push_back(sphere.pt);
-        }
+          // Locate sphere in image
+          cv::KeyPoint prev_sphere = this->image_proc.detectSphere(this->prev_image_);
+          // Calculate 3D point of sphere's center and store its information
+          bool detect_result = this->math_handler.detectEdgePoint(this->prev_depth_, echo_sounder_msg->confidence, prev_sphere);
 
-        if (this->SAVE_IMAGES_)
-        {
-          saveImage(this->prev_image_, sphere, detect_result);
-        }
-
-        this->counter_ = 0;
-      }
-
-      // If --
-      //    structure detected in range AND
-      //    confidence level is equal to or greater than the minimum confidence level
-      // then setup for hold or continue to hold
-      else if (this->MIN_DETECT_DEPTH_ < echo_sounder_msg->distance &&
-        echo_sounder_msg->distance < this->MAX_DETECT_DEPTH_ &&
-        this->MIN_CONFIDENCE_LEVEL_ <= echo_sounder_msg->confidence)
-      {
-        // Begin counter for the structure to be detected for a period
-        if (!this->prev_structure_detected_)
-        {
-          this->prev_structure_detected_ = true;
-          this->counter_ = 1;
-          message = "STRUCTURE DETECTED";
-        }
-        else
-        {
-          // Hold complete
-          if (this->FINAL_HOLD_COUNT_ < this->counter_)
+          // If successful, then make sure GUI knows to show it
+          if (detect_result)
           {
-            message = "FINISHED HOLD";
+            // Get index from distance value and store sphere's center point in a data structure
+            int d_ind = static_cast<int>((this->prev_depth_ - this->MIN_DETECT_DEPTH_) / this->DETECT_DEPTH_RANGE_);
+            this->calib_gui.visual_point_data_.at(d_ind).push_back(prev_sphere.pt);
           }
-          // Continue to hold
+
+          this->counter_ = 0;
+        }
+
+        // If --
+        //    structure detected in range AND
+        //    confidence level is equal to or greater than the minimum confidence level
+        // then setup for hold or continue to hold
+        else if (this->MIN_DETECT_DEPTH_ < echo_sounder_msg->distance &&
+          echo_sounder_msg->distance < this->MAX_DETECT_DEPTH_ &&
+          this->MIN_CONFIDENCE_LEVEL_ <= echo_sounder_msg->confidence)
+        {
+          // Locate sphere in image
+          cur_sphere = this->image_proc.detectSphere(cv_ptr->image);
+          // Calculate 3D point of sphere's center and store its information
+          bool detect_result = this->math_handler.detectEdgePoint(echo_sounder_msg->distance, echo_sounder_msg->confidence, cur_sphere);
+
+          // FUTURE: this is currently set up to remove noise of false true detections.
+          // However, it is not truly implemented as we take all points that are detected.
+
+          // Begin counter for the structure to be detected for a period
+          if (!this->prev_structure_detected_)
+          {
+            message = "STRUCTURE DETECTED";
+            this->prev_structure_detected_ = true;
+            this->counter_ = 1;
+          }
           else
           {
-            message = "HOLD: " + std::to_string(this->FINAL_HOLD_COUNT_ - this->counter_);
-            this->counter_++;
+            // Hold complete
+            if (this->FINAL_HOLD_COUNT_ < this->counter_)
+            {
+              message = "FINISHED HOLD";
+            }
+            // Continue to hold
+            else
+            {
+              message = "HOLD: " + std::to_string(this->FINAL_HOLD_COUNT_ - this->counter_);
+              this->counter_++;
+            }
           }
+
+          // Save image for potential edge point detection
+          this->prev_image_ = cur_image;
+          this->prev_depth_ = echo_sounder_msg->distance;
         }
 
-        // Save image for potential edge point detection
-        this->prev_image_ = cur_image;
-        this->prev_depth_ = echo_sounder_msg->distance;
-      }
-      // No structure detected
-      else
-      {
-        // Clear parameters
-        if (this->prev_structure_detected_)
+        // No structure detected
+        else
         {
-          this->prev_structure_detected_ = false;
-          this->counter_ = 0;
+          // Clear parameters
+          if (this->prev_structure_detected_)
+          {
+            this->prev_structure_detected_ = false;
+            this->counter_ = 0;
+          }
         }
       }
     }
-    // User has calibration on pause
+
+    // User has ESCalibr on pause
     else
     {
       // Pause should clear parameters
       this->prev_structure_detected_ = false;
       this->counter_ = 0;
-    }
-
-    // Outline sphere in image if detected and in debug mode
-    cv::KeyPoint sphere = cv::KeyPoint();
-    if (this->calib_gui.debug && this->counter_ > 0)
-    {
-      sphere = this->image_proc.detectSphere(cur_image);
     }
 
     // Get index in collected point data structure for the current depth reading
@@ -201,7 +212,7 @@ void EchoSounderCameraHandler::echoSounderAndImageCallback(const sensor_msgs::Im
 }
 
 
-void EchoSounderCameraHandler::saveImage(cv::Mat image, cv::KeyPoint sphere, bool detect_result)
+void EchoSounderCameraHandler::saveImage(cv::Mat image, cv::KeyPoint cur_sphere, bool detect_result)
 {
   if (detect_result)  // Saving successful detection of sphere
   {

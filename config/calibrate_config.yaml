@@ -16,4 +16,4 @@ max_detect_depth: 3.1
 detect_depth_range: 0.1
 min_echo_depth: 0.4  # echo sounder's blanking depth
 max_echo_depth: 100.0   # echo sounder's maximum depth range
-min_confidence_level: 50
+min_confidence_level: 1

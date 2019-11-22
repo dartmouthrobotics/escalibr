@@ -31,8 +31,10 @@ public:
 
   /** Parameters used for the GUI buttons.
    */
-  static bool play;     /**< true: collect data points; false: do not collect data points */
-  static bool debug;    /**< true: draw red circle around sphere when detected; false: no drawing */
+  static bool play;       /**< true: collect data points; false: do not collect data points */
+  static bool debug;      /**< true: draw red circle around sphere when detected; false: no drawing */
+  static bool calibrate;  /**< true: start calibrating by using the collected data */
+  static bool save;       /**< true: save calibration results */
 
   /** Parameters used for the GUI data chart.
     */

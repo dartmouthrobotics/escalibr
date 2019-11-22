@@ -1,0 +1,3 @@
+<launch>
+ <node pkg="escalibr" type="extract" name="echo_sounder_camera_extraction" output="screen"/>
+</launch>

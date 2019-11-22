@@ -42,14 +42,18 @@ public:
    *  \param sphere is the center point of the sphere that was successfully detected.
    *            Could be no sphere, if it was not detected.
    */
-  bool detectEdgePoint(float distance, cv::KeyPoint sphere);
+  bool detectEdgePoint(float distance, int confidence, cv::KeyPoint sphere);
 
   /** Function for saving successfully found 3D edge points and its echo sounder measurement.
    *
    *  \param edge_point is the 3D point of the sphere's center
    *  \param distanc is the measurement given by the echo sounder.
    */
-  void saveData(cv::Scalar edge_point, float distance);
+  void saveData(cv::Scalar edge_point, float distance, int confidence);
+
+  /** Function for calibrating echo sounder and camera.
+    */
+  void calibrateEchoSounder();
 
   // TO DO: NOT USED CURRENTLY
   // int checkEllipse(float range);

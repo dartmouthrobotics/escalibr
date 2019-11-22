@@ -26,7 +26,7 @@ namespace escalibr
 // appEllipse;
 
 
-bool CalibrationMath::detectEdgePoint(float distance, cv::KeyPoint sphere)
+bool CalibrationMath::detectEdgePoint(float distance, int confidence, cv::KeyPoint sphere)
 {
   // Sphere is detected in image
   if (sphere.size != 0)
@@ -39,10 +39,10 @@ bool CalibrationMath::detectEdgePoint(float distance, cv::KeyPoint sphere)
     image_points.push_back(cv::Point2d(sphere.pt.x, sphere.pt.y + sphere.size/2));
 
     std::vector<cv::Point3d> world_points;
-    world_points.push_back(cv::Point3d(-0.1f, 0.0f, 0.0f));
-    world_points.push_back(cv::Point3d(0.1f, 0.0f, 0.0f));
-    world_points.push_back(cv::Point3d(0.0f, -0.1f, 0.0f));
-    world_points.push_back(cv::Point3d(0.0f, 0.1f, 0.0f));
+    world_points.push_back(cv::Point3d(-0.05f, 0.0f, 0.0f));
+    world_points.push_back(cv::Point3d(0.05f, 0.0f, 0.0f));
+    world_points.push_back(cv::Point3d(0.0f, -0.05f, 0.0f));
+    world_points.push_back(cv::Point3d(0.0f, 0.05f, 0.0f));
 
     // Zero because we have undistorted the image
     cv::Mat dist_coeffs = cv::Mat::zeros(4, 1, cv::DataType<double>::type);
@@ -59,9 +59,9 @@ bool CalibrationMath::detectEdgePoint(float distance, cv::KeyPoint sphere)
 
     cv::solvePnP(world_points, image_points, instrinsic, dist_coeffs, rotation_vector, translation_vector);
 
-    std::cout << "x: " << translation_vector.at<double>(0, 0) << "\ty: " <<
-      translation_vector.at<double>(1, 0) << "\tz: " << translation_vector.at<double>(2, 0) <<
-      "\tdepth: " << distance << std::endl;
+    // std::cout << "x: " << translation_vector.at<double>(0, 0) << "\ty: " <<
+    //   translation_vector.at<double>(1, 0) << "\tz: " << translation_vector.at<double>(2, 0) <<
+    //   "\tdepth: " << distance << "\tconfidence: " << confidence << std::endl;
 
     cv::Scalar new_edge_point(translation_vector.at<double>(0, 0),
       translation_vector.at<double>(1, 0), translation_vector.at<double>(2, 0));
@@ -70,7 +70,7 @@ bool CalibrationMath::detectEdgePoint(float distance, cv::KeyPoint sphere)
     this->collected_data_points_++;
 
     // Save data in YAML file for later checks
-    saveData(new_edge_point, distance);
+    // saveData(new_edge_point, distance, confidence);
 
     return true;
   }
@@ -81,7 +81,7 @@ bool CalibrationMath::detectEdgePoint(float distance, cv::KeyPoint sphere)
 }
 
 
-void CalibrationMath::saveData(cv::Scalar edge_point, float distance)
+void CalibrationMath::saveData(cv::Scalar edge_point, float distance, int confidence)
 {
   // Find file
   std::string filename = "/home/darobot/Research/escalibr/catkin_ws/src/escalibr/output.xml";
@@ -99,15 +99,22 @@ void CalibrationMath::saveData(cv::Scalar edge_point, float distance)
   }
 
   this->file_counter++;
-  TiXmlElement * save_data_point = new TiXmlElement(std::to_string(this->file_counter));
+  TiXmlElement * save_data_point = new TiXmlElement("data_" + std::to_string(this->file_counter));
   this->out_doc.LinkEndChild(save_data_point);
   save_data_point->SetDoubleAttribute("x", edge_point[0]);
   save_data_point->SetDoubleAttribute("y", edge_point[1]);
   save_data_point->SetDoubleAttribute("z", edge_point[2]);
   save_data_point->SetDoubleAttribute("depth", distance);
+  save_data_point->SetDoubleAttribute("confidence", confidence);
 
   // End file
   this->out_doc.SaveFile(filename);
+}
+
+
+void CalibrationMath::calibrateEchoSounder()
+{
+  std::cout << std::endl << "TO DO: calibration time..." << std::endl;
 }
 
 

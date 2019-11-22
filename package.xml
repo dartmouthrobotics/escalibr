@@ -19,9 +19,11 @@
   <build_depend>roscpp</build_depend>
   <build_depend>roslint</build_depend>
   <build_depend>sensor_msgs</build_depend>
+  <build_depend>geometry_msgs</build_depend>
   <build_depend>message_generation</build_depend>
   <build_depend>message_filters</build_depend>
   <build_depend>ping_nodelet</build_depend>
+  <build_depend>ORB_SLAM2</build_depend>
   <build_depend>cv_bridge</build_depend>
   <build_depend>opencv2</build_depend>
 
@@ -29,9 +31,11 @@
   <build_export_depend>roscpp</build_export_depend>
   <build_export_depend>roslint</build_export_depend>
   <build_export_depend>sensor_msgs</build_export_depend>
+  <build_export_depend>geometry_msgs</build_export_depend>
   <build_export_depend>message_generation</build_export_depend>
   <build_export_depend>message_filters</build_export_depend>
   <build_export_depend>ping_nodelet</build_export_depend>
+  <build_export_depend>ORB_SLAM2</build_export_depend>
   <build_export_depend>cv_bridge</build_export_depend>
   <build_export_depend>opencv2</build_export_depend>
 
@@ -39,9 +43,11 @@
   <exec_depend>roscpp</exec_depend>
   <exec_depend>roslint</exec_depend>
   <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
   <exec_depend>message_generation</exec_depend>
   <exec_depend>message_filters</exec_depend>
   <exec_depend>ping_nodelet</exec_depend>
+  <exec_depend>ORB_SLAM2</exec_depend>
   <exec_depend>cv_bridge</exec_depend>
   <exec_depend>opencv2</exec_depend>
 
