@@ -206,7 +206,7 @@ void EchoSounderCameraHandler::echoSounderAndImageCallback(const sensor_msgs::Im
     int d_ind = static_cast<int>((this->prev_depth_ - this->MIN_DETECT_DEPTH_) / this->DETECT_DEPTH_RANGE_);
 
     // Display information in GUI window
-    this->calib_gui.run(cur_image, sphere, echo_sounder_msg->distance,
+    this->calib_gui.run(cur_image, cur_sphere, echo_sounder_msg->distance,
       echo_sounder_msg->confidence, message, d_ind);
   }
 }
@@ -217,7 +217,7 @@ void EchoSounderCameraHandler::saveImage(cv::Mat image, cv::KeyPoint cur_sphere,
   if (detect_result)  // Saving successful detection of sphere
   {
     // Draw sphere
-    cv::circle(image, sphere.pt, sphere.size/2, cv::Scalar(0, 0, 255), 3);
+    cv::circle(image, cur_sphere.pt, cur_sphere.size/2, cv::Scalar(0, 0, 255), 3);
     std::string filename = "/home/darobot/Research/escalibr/catkin_ws/src/escalibr/collected_data/image_" +
       std::to_string(this->math_handler.collected_data_points_) + ".jpg";
     cv::imwrite(filename, image);
